@@ -19,8 +19,8 @@ protocol CombatProtocol{
     func explode()
 }
 
-enum Role{
-    case player,boss,minion,meterite
+enum Identity:UInt32{
+    case player = 1,minion = 2,meterite = 4
 }
 
 enum AmmunitionType{
@@ -28,45 +28,57 @@ enum AmmunitionType{
 }
 
 class GameObjectFactory{
-    static func getStarShip(role:Role,name:String)->StarShip{
+    static func getStarShip(role:Identity,size:CGSize,name:String)->StarShip{
         switch role {
         case .player:
-            let ship = StarShip(imageNamed: name)
-            ship.role = role
+            let ship = StarShip(imageNamed: name, size: size, role: role)
             ship.ammoType = AmmunitionType.missile
             ship.health = 100
+            ship.speed = 15
             return ship
         case .minion:
-            let ship = StarShip(imageNamed: name)
-            ship.role = role
+            let ship = StarShip(imageNamed: name, size: size, role: role)
             ship.ammoType = AmmunitionType.basic
             ship.health = 10
             ship.speed = 15
             return ship
         default:
-            return StarShip(imageNamed: name)
+            return StarShip(imageNamed: name, size: size, role: .minion)
         }
     }
-    static func getAmmunition(ammoType:AmmunitionType)->Ammuniation{
+    static func getAmmunition(ammoType:AmmunitionType, size: CGSize,role:Identity)->Ammuniation{
         switch ammoType {
         case .basic:
-            let ammo = Ammuniation(imageNamed: "missile",damage:5)
-            ammo.speed = 20
-            return ammo
+            return Ammuniation(imageNamed: "missile",size:size,role:role,damage:5)
         case .missile:
-            return Ammuniation(imageNamed: "missile",damage:10)
+            return Ammuniation(imageNamed: "missile",size:size,role:role,damage:10)
         default:
-            return Ammuniation(imageNamed: "missile",damage:5)
+            return Ammuniation(imageNamed: "missile",size:size,role:role,damage:5)
         }
     }
 }
 
 
 class MovingObject: SKSpriteNode,NavigateProtocol{
-
-    init(imageNamed:String){
+    var role:Identity?
+    init(imageNamed:String,size:CGSize,role: Identity){
         let texture = SKTexture(imageNamed: imageNamed)
-        super.init(texture: texture, color: .clear, size: CGSize(width: 1, height: 1))
+        super.init(texture: texture, color: .clear, size: size)
+        self.role = role
+        let body = SKPhysicsBody(circleOfRadius: max(self.size.height/2,self.size.width/2))
+        body.categoryBitMask = role.rawValue
+        body.collisionBitMask = 0
+        body.affectedByGravity = false
+        body.usesPreciseCollisionDetection = true
+        switch role {
+        case .player:
+            body.contactTestBitMask = Identity.minion.rawValue
+        case .minion:
+            body.contactTestBitMask = Identity.player.rawValue
+        default:
+            body.contactTestBitMask = Identity.meterite.rawValue
+        }
+        self.physicsBody = body
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -97,13 +109,13 @@ class MovingObject: SKSpriteNode,NavigateProtocol{
 class Ammuniation: MovingObject{
     var damage:Int?
     
-    convenience init(imageNamed: String, damage: Int) {
-        self.init(imageNamed: imageNamed)
+    convenience init(imageNamed: String, size: CGSize, role: Identity,damage:Int){
+        self.init(imageNamed: imageNamed, size:size, role: role)
         self.damage = damage
     }
-    override init(imageNamed: String) {
-        super.init(imageNamed: imageNamed)
-        self.speed = 25
+    override init(imageNamed: String, size: CGSize, role: Identity) {
+        super.init(imageNamed: imageNamed, size: size, role: role)
+        self.speed = 18
     }
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -112,14 +124,18 @@ class Ammuniation: MovingObject{
 
 class StarShip: MovingObject, CombatProtocol{
     
-    var role:Role?
-    var health: Int?
+    var health: Int?{
+        didSet{
+            if self.health! < 0{
+                self.explode()
+            }
+        }
+    }
     var ammoType: AmmunitionType?
     var shield: Int?
     
-    override init(imageNamed: String) {
-        super.init(imageNamed: imageNamed)
-        self.speed = 20
+    override init(imageNamed: String,size:CGSize, role:Identity) {
+        super.init(imageNamed: imageNamed,size: size,role: role)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -127,8 +143,8 @@ class StarShip: MovingObject, CombatProtocol{
     }
     
     func shoot(){
-        if let gameScene = self.parent, let ammoType = ammoType{
-            let ammo = GameObjectFactory.getAmmunition(ammoType: ammoType)
+        if let gameScene = self.parent, let ammoType = ammoType,let role = self.role{
+            let ammo = GameObjectFactory.getAmmunition(ammoType: ammoType,size: self.size.divideBy(by: 2),role: role)
             ammo.position = self.position
             ammo.size = CGSize(width: self.size.width/2, height: self.size.height/2)
             ammo.zPosition = self.zPosition
@@ -139,8 +155,8 @@ class StarShip: MovingObject, CombatProtocol{
         }
     }
     func shootAt(target:CGPoint){
-        if let gameScene = self.parent, let ammoType = ammoType{
-            let ammo = GameObjectFactory.getAmmunition(ammoType: ammoType)
+        if let gameScene = self.parent, let ammoType = ammoType, let role = self.role{
+            let ammo = GameObjectFactory.getAmmunition(ammoType: ammoType,size: self.size.divideBy(by: 2),role: role)
             ammo.zRotation = MathUtility.getZrotation(vec: CGVector(dx:target.x-self.position.x,dy:target.y-self.position.y))
             ammo.position = self.position
             ammo.size = CGSize(width: self.size.width/2, height: self.size.height/2)
@@ -159,7 +175,11 @@ class StarShip: MovingObject, CombatProtocol{
     
 }
 
-
+extension CGSize{
+    func divideBy(by:CGFloat)->CGSize{
+        return CGSize(width: self.width/by, height: self.height/by)
+    }
+}
 extension CGFloat{
     var f:Float{
         return Float(self)

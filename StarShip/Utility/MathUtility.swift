@@ -24,7 +24,6 @@ class MathUtility{
         }else if(vec.dx<0 && vec.dy>0){
             return (.pi*1.5) + direction
         }else if(vec.dx<0 && vec.dy<0){
-            print(direction)
             return direction - .pi/2
         }
         return 0.0
