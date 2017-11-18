@@ -162,15 +162,15 @@ class StarShip: MovingObject, CombatProtocol{
             ammo.size = CGSize(width: self.size.width/2, height: self.size.height/2)
             ammo.zPosition = self.zPosition
             gameScene.addChild(ammo)
-            ammo.move(to: target, completion: {
-                ammo.removeFromParent()
+            let maxLocation = MathUtility.getFurthestPoint(target: target, current: self.position, bountry: gameScene.frame)
+            ammo.move(to: maxLocation, completion: {
+                    ammo.removeFromParent()
             })
         }
     }
     func explode(){
         self.removeAllActions()
         self.removeFromParent()
-        self.health = 0
     }
     
 }

@@ -27,18 +27,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(player!)
         inProgress = true
         spawnEnemy()
-        DispatchQueue.global(qos: .default).async {
-            while(self.inProgress){
-                if let player = self.player{
-                    print(player)
-                }
-                else{
-                    print("player is either dead or no activated ")
-                }
-                sleep(5)
-            }
-        }
-       // testDirection()
+        //testDirection()
     }
     func gameOver(){
         self.inProgress = false
@@ -123,12 +112,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func testDirection(){
         if let player = player{
             let enemy1 = GameObjectFactory.getStarShip(role: .minion,size:player.size, name: "enemy")
-            enemy1.position = CGPoint(x: player.position.x+100, y: player.position.y+100)
+            enemy1.position = CGPoint(x: player.position.x, y: player.position.y+100)
             enemy1.zPosition = 1
             enemy1.zRotation = -.pi/2
             enemy1.size = player.size
             let enemy2 = GameObjectFactory.getStarShip(role: .minion,size:player.size, name: "enemy")
-            enemy2.position = CGPoint(x: player.position.x-100, y: player.position.y+100)
+            enemy2.position = CGPoint(x: player.position.x-100, y: player.position.y)
             enemy2.zPosition = 1
             enemy2.zRotation = .pi/2
             enemy2.size = player.size
@@ -146,6 +135,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             addChild(enemy2)
             addChild(enemy3)
             addChild(enemy4)
+            let shootQue = DispatchQueue.global(qos: .default)
+            shootQue.async {
+                while(self.inProgress){
+                    enemy1.shootAt(target: player.position)
+                    enemy2.shootAt(target: player.position)
+                    enemy3.shootAt(target: player.position)
+                    enemy4.shootAt(target: player.position)
+                    sleep(2)
+                }
+            }
         }
        
     }
