@@ -36,14 +36,14 @@ class GameObjectFactory{
         case .player:
             let ship = StarShip(imageNamed: name, size: size, role: role)
             ship.ammoType = AmmunitionType.missile
-            ship.health = 100
+            ship.health = 100.0
             ship.speed = 15
             return ship
         case .minion:
             let ship = StarShip(imageNamed: name, size: size, role: role)
             ship.ammoType = AmmunitionType.basic
-            ship.health = 30
-            ship.speed = 15
+            ship.health = 30.0
+            ship.speed = 5
             return ship
         default:
             return StarShip(imageNamed: name, size: size, role: .minion)
@@ -52,11 +52,11 @@ class GameObjectFactory{
     static func getAmmunition(ammoType:AmmunitionType, size: CGSize,role:Identity)->Ammuniation{
         switch ammoType {
         case .basic:
-            return Ammuniation(imageNamed: "missile",size:size,role:role,damage:5)
+            return Ammuniation(imageNamed: "missile",size:size,role:role,damage:5.0)
         case .missile:
-            return Ammuniation(imageNamed: "missile",size:size,role:role,damage:10)
+            return Ammuniation(imageNamed: "missile",size:size,role:role,damage:10.0)
         default:
-            return Ammuniation(imageNamed: "missile",size:size,role:role,damage:5)
+            return Ammuniation(imageNamed: "missile",size:size,role:role,damage:5.0)
         }
     }
 }
@@ -87,6 +87,7 @@ class MovingObject: SKSpriteNode,NavigateProtocol{
     }
     
     required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -116,9 +117,9 @@ class MovingObject: SKSpriteNode,NavigateProtocol{
 }
 
 class Ammuniation: MovingObject{
-    var damage:Int?
+    var damage:Float?
     
-    convenience init(imageNamed: String, size: CGSize, role: Identity,damage:Int){
+    convenience init(imageNamed: String, size: CGSize, role: Identity,damage:Float){
         self.init(imageNamed: imageNamed, size:size, role: role)
         self.damage = damage
     }
@@ -133,7 +134,7 @@ class Ammuniation: MovingObject{
 
 class StarShip: MovingObject, CombatProtocol{
     
-    var health: Int?{
+    var health: Float?{
         didSet{
             if self.health! < 0{
                 self.explode()
@@ -141,7 +142,7 @@ class StarShip: MovingObject, CombatProtocol{
         }
     }
     var ammoType: AmmunitionType?
-    var shield: Int?
+    var shield: Float?
     
     override init(imageNamed: String,size:CGSize, role:Identity) {
         super.init(imageNamed: imageNamed,size: size,role: role)

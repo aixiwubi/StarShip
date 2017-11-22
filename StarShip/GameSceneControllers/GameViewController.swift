@@ -11,14 +11,21 @@ import SpriteKit
 import GameplayKit
 
 class GameViewController: UIViewController {
-
+        
+    @IBOutlet weak var playerHealth: StatusBar!
+    
+    var physicsContactDelegate = GameLogic()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         if let view = self.view as! SKView? {
             let scene = GameScene(size: view.frame.size)
+            physicsContactDelegate.gameScene = scene
+            physicsContactDelegate.controller = self
             print(view.frame.size)
             scene.anchorPoint = CGPoint(x: 0.5, y: 0.5)
             scene.scaleMode = .aspectFill
+            scene.physicsWorld.contactDelegate = physicsContactDelegate
             view.presentScene(scene)
             view.ignoresSiblingOrder = true
             view.showsFPS = true
@@ -27,7 +34,7 @@ class GameViewController: UIViewController {
     }
 
     override var shouldAutorotate: Bool {
-        return true
+        return false
     }
 
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {

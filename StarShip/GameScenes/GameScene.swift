@@ -13,15 +13,14 @@ class GameScene: SKScene {
     var inProgress: Bool = false
     var player:StarShip?
     var background:SKSpriteNode = SKSpriteNode(imageNamed: "galaxy")
-    var physicsContactDelegate = GameLogic()
     
-    override func didMove(to view: SKView) {
-       
-        player = GameObjectFactory.getStarShip(role: Identity.player,
-                                               size:self.frame.size.divideBy(by: 15),
-                                               name: "falcon")
-        physicsContactDelegate.gameScene = self
-        physicsWorld.contactDelegate = physicsContactDelegate
+    override func didMove(to view: SKView){
+        player = GameObjectFactory
+            .getStarShip(
+                role: Identity.player,
+                size:self.frame.size.divideBy(by: 15),
+                name: "falcon"
+        )
         background.zPosition = 0
         background.scale(to: self.frame.size)
         player!.zPosition = 1
@@ -32,17 +31,15 @@ class GameScene: SKScene {
         inProgress = true
         spawnEnemy()
         spawnBuff()
-        //testDirection()
-        
-       
     }
 
     func spawnBuff(){
         if let player = player{
-            let buff = GameObjectFactory.getMovingObject(
-                imageNamed: "star",
-                size: CGSize(width: player.size.width/2, height: player.size.height/2),
-                role: .buff)
+            let buff = GameObjectFactory
+                .getMovingObject(
+                    imageNamed: "star",
+                    size: CGSize(width: player.size.width/2, height: player.size.height/2),
+                    role: .buff)
             buff.position = CGPoint(x:self.frame.midX + 100, y:self.frame.midY - 100)
             addChild(buff)
         }
@@ -90,7 +87,6 @@ class GameScene: SKScene {
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in touches{
-        
             if let player = player{
                 player.removeAllActions()
                 player.move(to: touch.location(in: self))

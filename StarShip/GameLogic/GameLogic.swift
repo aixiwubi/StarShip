@@ -11,7 +11,22 @@ import SpriteKit
 import GameplayKit
 
 class GameLogic:NSObject, SKPhysicsContactDelegate{
-    weak var gameScene: SKScene?
+    
+    weak var gameScene: GameScene?
+    weak var controller: GameViewController?
+    var percentage: Float?{
+        didSet{
+            if let controller = controller{
+                controller.playerHealth.percentage = percentage
+                if percentage == Float(0.0){
+                    gameScene?.inProgress = false
+                    gameScene?.removeAllActions()
+                    gameScene?.removeAllChildren()
+                }
+            }
+        }
+    }
+    
     func didBegin(_ contact: SKPhysicsContact) {
         if let first = contact.bodyA.node as? MovingObject, let second = contact.bodyB.node as? MovingObject {
             if let missile = first as? Ammuniation, let ship = second as? StarShip{
@@ -44,26 +59,48 @@ class GameLogic:NSObject, SKPhysicsContactDelegate{
         }
     }
     
-    func missileShipCollision(ship:StarShip,missile:Ammuniation){
+    private func missileShipCollision(ship:StarShip,missile:Ammuniation){
         ship.health! -= missile.damage!
+        if ship.role == .player{
+            updateHealth(ship: ship)
+        }
         missile.explode()
     }
-    func missileCollision(first:MovingObject,second:MovingObject){
+    
+    private func missileCollision(first:MovingObject,second:MovingObject){
         first.explode()
         second.explode()
     }
-    func shipCollision(first:StarShip,second:StarShip){
+    
+    private func shipCollision(first:StarShip,second:StarShip){
         print("collide with enemy ship")
         let damage1 = first.health!
         let damage2 = second.health!
         first.health! -= damage2
         second.health! -= damage1
+        if first.role == .player{
+            updateHealth(ship: first)
+        }else{
+            updateHealth(ship: second)
+        }
     }
-    func animateExplosion(location:CGPoint, radius:CGSize){
+    private func updateHealth(ship:StarShip){
+        if let health = ship.health{
+            if health <= Float(0){
+                percentage = Float(0.0)
+            }else{
+                percentage = health/100.0
+            }
+        }
+        
+    }
+    
+    private func animateExplosion(location:CGPoint, radius:CGSize){
         if let scene = gameScene {
-            let explosion = GameObjectFactory.getMovingObject(imageNamed: "explosion", size: radius.divideBy(by: 30), role: .nocontact)
-            let expand = SKAction.scale(to: radius, duration: 1)
-            let shrink = SKAction.scale(to: radius.divideBy(by: 30), duration: 1)
+            let square = radius.square()
+            let explosion = GameObjectFactory.getMovingObject(imageNamed: "explosion", size: square.divideBy(by: 30), role: .nocontact)
+            let expand = SKAction.scale(to: square, duration: 1)
+            let shrink = SKAction.scale(to: square.divideBy(by: 30), duration: 1)
             explosion.position = location
             scene.addChild(explosion)
             explosion.run(expand, completion: {
@@ -75,4 +112,10 @@ class GameLogic:NSObject, SKPhysicsContactDelegate{
     }
 }
 
+extension CGSize{
+    func square()->CGSize{
+        let side = min(self.height,self.width)
+        return CGSize(width: side, height: side)
+    }
+}
 
