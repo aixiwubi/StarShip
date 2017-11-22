@@ -9,15 +9,19 @@
 import SpriteKit
 import GameplayKit
 
-class GameScene: SKScene, SKPhysicsContactDelegate {
+class GameScene: SKScene {
     var inProgress: Bool = false
     var player:StarShip?
     var background:SKSpriteNode = SKSpriteNode(imageNamed: "galaxy")
+    var physicsContactDelegate = GameLogic()
+    
     override func didMove(to view: SKView) {
+       
         player = GameObjectFactory.getStarShip(role: Identity.player,
-                                               size:CGSize(width: self.frame.width/15, height: self.frame.height/15),
+                                               size:self.frame.size.divideBy(by: 15),
                                                name: "falcon")
-        physicsWorld.contactDelegate = self
+        physicsContactDelegate.gameScene = self
+        physicsWorld.contactDelegate = physicsContactDelegate
         background.zPosition = 0
         background.scale(to: self.frame.size)
         player!.zPosition = 1
@@ -27,7 +31,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(player!)
         inProgress = true
         spawnEnemy()
+        spawnBuff()
         //testDirection()
+        
+       
+    }
+
+    func spawnBuff(){
+        if let player = player{
+            let buff = GameObjectFactory.getMovingObject(
+                imageNamed: "star",
+                size: CGSize(width: player.size.width/2, height: player.size.height/2),
+                role: .buff)
+            buff.position = CGPoint(x:self.frame.midX + 100, y:self.frame.midY - 100)
+            addChild(buff)
+        }
     }
     func gameOver(){
         self.inProgress = false
@@ -35,37 +53,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.removeAllChildren()
         self.removeFromParent()
     }
-    func missileShipCollision(ship:StarShip,missile:Ammuniation){
-        ship.health! -= missile.damage!
-        missile.removeAllActions()
-        missile.removeFromParent()
 
-    }
-    func missileCollision(first:MovingObject,second:MovingObject){
-        first.removeAllActions()
-        second.removeAllActions()
-        first.removeFromParent()
-        second.removeFromParent()
-    }
-    func shipCollision(first:StarShip,second:StarShip){
-        let damage1 = first.health!
-        let damage2 = second.health!
-        first.health! -= damage2
-        second.health! -= damage1
-    }
-    func didBegin(_ contact: SKPhysicsContact) {
-        if let first = contact.bodyA.node as? MovingObject, let second = contact.bodyB.node as? MovingObject {
-            if let missile = first as? Ammuniation, let ship = second as? StarShip{
-                missileShipCollision(ship: ship, missile: missile)
-            }
-            else if let missile = second as? Ammuniation, let ship = first as? StarShip{
-                missileShipCollision(ship: ship, missile: missile)
-            }
-            else if let missile1 = first as? Ammuniation, let missile2 = second as? Ammuniation{
-                missileCollision(first: missile1, second: missile2)
-            }
-        }    
-    }
    
     func spawnEnemy(){
         let que = DispatchQueue.global(qos: .default)
@@ -79,11 +67,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     let x = CGFloat(random*diff) + self.frame.minX
                     // print(random)
                     enemy.position = CGPoint(x: x, y: self.frame.maxY)
-                    self.addChild(enemy)
+                    DispatchQueue.main.async {
+                         self.addChild(enemy)
+                    }
                     let shootQue = DispatchQueue.global(qos: .default)
                     shootQue.async {
                         while(enemy.health!>0){
-                            enemy.shootAt(target: player.position)
+                            DispatchQueue.main.async {
+                                 enemy.shootAt(target: player.position)
+                            }
                             sleep(2)
                         }
                     }
@@ -98,7 +90,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in touches{
+        
             if let player = player{
+                player.removeAllActions()
                 player.move(to: touch.location(in: self))
                 player.shoot()
             }
@@ -108,6 +102,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
+       
     }
     func testDirection(){
         if let player = player{

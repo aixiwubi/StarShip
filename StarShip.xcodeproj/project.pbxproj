@@ -16,6 +16,7 @@
 		2110E98A1FB769C4007268B8 /* StarShipUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2110E9891FB769C4007268B8 /* StarShipUITests.swift */; };
 		2110E9991FB76A4E007268B8 /* StarShips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2110E9981FB76A4E007268B8 /* StarShips.swift */; };
 		2110E99B1FB8D990007268B8 /* MathUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2110E99A1FB8D990007268B8 /* MathUtility.swift */; };
+		216D3D6E1FC51EE400EC41E1 /* GameLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 216D3D6D1FC51EE400EC41E1 /* GameLogic.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +43,7 @@
 		2110E98B1FB769C4007268B8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2110E9981FB76A4E007268B8 /* StarShips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarShips.swift; sourceTree = "<group>"; };
 		2110E99A1FB8D990007268B8 /* MathUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathUtility.swift; sourceTree = "<group>"; };
+		216D3D6D1FC51EE400EC41E1 /* GameLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameLogic.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,6 +85,7 @@
 		2110E96D1FB769C4007268B8 /* StarShip */ = {
 			isa = PBXGroup;
 			children = (
+				216D3D6A1FC51ABF00EC41E1 /* GameLogic */,
 				2110E99C1FB90086007268B8 /* Utility */,
 				2110E9971FB76A32007268B8 /* StarShipObjects */,
 				2110E9961FB76A21007268B8 /* GameSceneControllers */,
@@ -143,6 +146,14 @@
 				2110E99A1FB8D990007268B8 /* MathUtility.swift */,
 			);
 			path = Utility;
+			sourceTree = "<group>";
+		};
+		216D3D6A1FC51ABF00EC41E1 /* GameLogic */ = {
+			isa = PBXGroup;
+			children = (
+				216D3D6D1FC51EE400EC41E1 /* GameLogic.swift */,
+			);
+			path = GameLogic;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -248,6 +259,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				216D3D6E1FC51EE400EC41E1 /* GameLogic.swift in Sources */,
 				2110E9751FB769C4007268B8 /* GameScene.swift in Sources */,
 				2110E99B1FB8D990007268B8 /* MathUtility.swift in Sources */,
 				2110E9771FB769C4007268B8 /* GameViewController.swift in Sources */,

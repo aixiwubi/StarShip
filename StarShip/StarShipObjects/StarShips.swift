@@ -16,11 +16,11 @@ protocol NavigateProtocol{
 
 protocol CombatProtocol{
     func shoot()
-    func explode()
 }
 
 enum Identity:UInt32{
-    case player = 1,minion = 2,meterite = 4
+    case nocontact = 0 ,player = 1,minion = 2,buff = 4
+    
 }
 
 enum AmmunitionType{
@@ -28,6 +28,9 @@ enum AmmunitionType{
 }
 
 class GameObjectFactory{
+    static func getMovingObject(imageNamed:String,size:CGSize,role: Identity)->MovingObject{
+        return MovingObject(imageNamed: imageNamed, size: size, role: role)
+    }
     static func getStarShip(role:Identity,size:CGSize,name:String)->StarShip{
         switch role {
         case .player:
@@ -39,7 +42,7 @@ class GameObjectFactory{
         case .minion:
             let ship = StarShip(imageNamed: name, size: size, role: role)
             ship.ammoType = AmmunitionType.basic
-            ship.health = 10
+            ship.health = 30
             ship.speed = 15
             return ship
         default:
@@ -65,18 +68,20 @@ class MovingObject: SKSpriteNode,NavigateProtocol{
         let texture = SKTexture(imageNamed: imageNamed)
         super.init(texture: texture, color: .clear, size: size)
         self.role = role
+        self.zPosition = 1
         let body = SKPhysicsBody(circleOfRadius: max(self.size.height/2,self.size.width/2))
         body.categoryBitMask = role.rawValue
         body.collisionBitMask = 0
         body.affectedByGravity = false
-        body.usesPreciseCollisionDetection = true
         switch role {
         case .player:
-            body.contactTestBitMask = Identity.minion.rawValue
+            body.contactTestBitMask = Identity.minion.rawValue & Identity.buff.rawValue
         case .minion:
             body.contactTestBitMask = Identity.player.rawValue
+        case .buff:
+            body.contactTestBitMask = Identity.player.rawValue
         default:
-            body.contactTestBitMask = Identity.meterite.rawValue
+            body.contactTestBitMask = role.rawValue
         }
         self.physicsBody = body
     }
@@ -103,6 +108,10 @@ class MovingObject: SKSpriteNode,NavigateProtocol{
         self.run(action) {
             completion()
         }
+    }
+    func explode(){
+        self.removeAllActions()
+        self.removeFromParent()
     }
 }
 
@@ -160,19 +169,14 @@ class StarShip: MovingObject, CombatProtocol{
             ammo.zRotation = MathUtility.getZrotation(vec: CGVector(dx:target.x-self.position.x,dy:target.y-self.position.y))
             ammo.position = self.position
             ammo.size = CGSize(width: self.size.width/2, height: self.size.height/2)
-            ammo.zPosition = self.zPosition
             gameScene.addChild(ammo)
             let maxLocation = MathUtility.getFurthestPoint(target: target, current: self.position, bountry: gameScene.frame)
             ammo.move(to: maxLocation, completion: {
-                    ammo.removeFromParent()
+                    ammo.explode()
             })
         }
     }
-    func explode(){
-        self.removeAllActions()
-        self.removeFromParent()
-    }
-    
+
 }
 
 extension CGSize{
