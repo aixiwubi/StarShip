@@ -15,6 +15,18 @@ class GameViewController: UIViewController {
     @IBOutlet weak var playerHealth: StatusBar!
     
     var physicsContactDelegate = GameLogic()
+    var gameDidEnd:Bool?{
+        didSet{
+            let gameOverAlert = UIAlertController.init(title: "Game Over", message: "You just Died", preferredStyle: .alert)
+            let action = UIAlertAction.init(title: "Ok", style: .default) { action in
+                print("clicked ok")
+            }
+            gameOverAlert.addAction(action)
+            present(gameOverAlert, animated: true) {
+                print("rip")
+            }
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -14,6 +14,7 @@ class GameScene: SKScene {
     var player:StarShip?
     var background:SKSpriteNode = SKSpriteNode(imageNamed: "galaxy")
     
+    
     override func didMove(to view: SKView){
         player = GameObjectFactory
             .getStarShip(
@@ -48,7 +49,6 @@ class GameScene: SKScene {
         self.inProgress = false
         self.removeAllActions()
         self.removeAllChildren()
-        self.removeFromParent()
     }
 
    

@@ -111,8 +111,11 @@ class MovingObject: SKSpriteNode,NavigateProtocol{
         }
     }
     func explode(){
-        self.removeAllActions()
-        self.removeFromParent()
+        let fade = SKAction.fadeOut(withDuration: 0.5)
+        self.run(fade) {
+            self.removeAllActions()
+            self.removeFromParent()
+        }
     }
 }
 

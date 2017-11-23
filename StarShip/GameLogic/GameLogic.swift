@@ -19,9 +19,12 @@ class GameLogic:NSObject, SKPhysicsContactDelegate{
             if let controller = controller{
                 controller.playerHealth.percentage = percentage
                 if percentage == Float(0.0){
-                    gameScene?.inProgress = false
-                    gameScene?.removeAllActions()
-                    gameScene?.removeAllChildren()
+                    let finale = SKAction.fadeOut(withDuration: 1)
+                    gameScene?.background.run(finale, completion: {
+                        self.gameScene?.gameOver()
+                        self.controller?.gameDidEnd = true
+                    })
+                   
                 }
             }
         }
