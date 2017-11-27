@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="xp5-S3-wef">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13527"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Game Menu Controller-->
+        <scene sceneID="zsm-1P-l7E">
+            <objects>
+                <viewController id="xp5-S3-wef" customClass="GameMenuController" customModule="StarShip" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Nva-bA-3Sk">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="lTy-ep-AJU">
+                                <rect key="frame" x="16" y="20" width="343" height="627"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="basic" id="bpz-9p-75X">
+                                        <rect key="frame" x="0.0" y="28" width="343" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="bpz-9p-75X" id="cQW-he-ZKW">
+                                            <rect key="frame" x="0.0" y="0.0" width="343" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="NpK-Df-e5q" kind="show" id="HqQ-Nh-z8u"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="XcD-7T-hPg" firstAttribute="bottom" secondItem="lTy-ep-AJU" secondAttribute="bottom" constant="20" id="6Da-4l-3E8"/>
+                            <constraint firstItem="lTy-ep-AJU" firstAttribute="leading" secondItem="XcD-7T-hPg" secondAttribute="leading" constant="16" id="9wX-Io-6D1"/>
+                            <constraint firstItem="XcD-7T-hPg" firstAttribute="trailing" secondItem="lTy-ep-AJU" secondAttribute="trailing" constant="16" id="MnC-UF-Rnv"/>
+                            <constraint firstItem="lTy-ep-AJU" firstAttribute="top" secondItem="XcD-7T-hPg" secondAttribute="top" id="gk2-6F-KHv"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="XcD-7T-hPg"/>
+                    </view>
+                    <connections>
+                        <outlet property="tableView" destination="lTy-ep-AJU" id="Z2E-Sj-age"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="uK3-TU-qkt" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-207.19999999999999" y="11.244377811094454"/>
+        </scene>
+        <!--GameScene-->
+        <scene sceneID="xE4-DP-UtR">
+            <objects>
+                <viewControllerPlaceholder storyboardName="GameScene" id="NpK-Df-e5q" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="aTQ-X2-f5L" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="550" y="12"/>
+        </scene>
+    </scenes>
+</document>
