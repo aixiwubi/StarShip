@@ -179,7 +179,7 @@ class StarShip: MovingObject, CombatProtocol{
     
     var health: Float?{
         didSet{
-            if self.health! < ConstantValue.minFloat{
+            if self.health! <= ConstantValue.minFloat{
                 self.explode()
             }
         }

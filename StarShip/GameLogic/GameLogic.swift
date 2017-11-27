@@ -69,8 +69,7 @@ class GameLogic:NSObject, SKPhysicsContactDelegate{
         if let type = buff.buff, let health = ship.health{
             switch type{
             case .Health(let x):
-                print(x)
-                ship.health = health + 10
+                ship.health = health + x
                 updateHealth(ship: ship)
             default:
                 print("default")
@@ -87,12 +86,13 @@ class GameLogic:NSObject, SKPhysicsContactDelegate{
     
     private func missileShipCollision(ship:StarShip,missile:Ammuniation){
         ship.health! -= missile.damage!
-        if ship.role == .player{
-            updateHealth(ship: ship)
-        }else if ship.role == .minion{
+        if ship.role == .minion{
             if ship.health! <= ConstantValue.minFloat{
                 updateScore()
             }
+        }
+        if ship.role == .player{
+            updateHealth(ship: ship)
         }
         missile.explode()
     }
