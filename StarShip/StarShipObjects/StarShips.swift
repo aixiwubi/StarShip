@@ -9,7 +9,7 @@
 import Foundation
 import SpriteKit
 
-protocol NavigateProtocol{
+protocol MovingProtocol{
     func move(to:CGPoint)
     func move(to:CGPoint,completion:@escaping ()->Void)
 }
@@ -36,14 +36,14 @@ class GameObjectFactory{
         case .player:
             let ship = StarShip(imageNamed: name, size: size, role: role)
             ship.ammoType = AmmunitionType.missile
-            ship.health = 100.0
-            ship.speed = 15
+            ship.health = ConstantValue.Player.maxHealth
+            ship.speed = ConstantValue.Player.normalSpeed
             return ship
         case .minion:
             let ship = StarShip(imageNamed: name, size: size, role: role)
             ship.ammoType = AmmunitionType.basic
-            ship.health = 30.0
-            ship.speed = 5
+            ship.health = ConstantValue.Enemy.maxHealth
+            ship.speed = ConstantValue.Enemy.normalSpeed
             return ship
         default:
             return StarShip(imageNamed: name, size: size, role: .minion)
@@ -52,18 +52,35 @@ class GameObjectFactory{
     static func getAmmunition(ammoType:AmmunitionType, size: CGSize,role:Identity)->Ammuniation{
         switch ammoType {
         case .basic:
-            return Ammuniation(imageNamed: "missile",size:size,role:role,damage:5.0)
+            return Ammuniation(
+                imageNamed: "missile",
+                size:size,role:role,
+                damage:ConstantValue.MissileDamage.basic
+            )
         case .missile:
-            return Ammuniation(imageNamed: "missile",size:size,role:role,damage:10.0)
+            return Ammuniation(
+                imageNamed: "missile",
+                size:size,role:role,
+                damage:ConstantValue.MissileDamage.missile
+            )
         default:
-            return Ammuniation(imageNamed: "missile",size:size,role:role,damage:5.0)
+            return Ammuniation(
+                imageNamed: "missile",
+                size:size,role:role,
+                damage:ConstantValue.MissileDamage.basic
+            )
         }
+    }
+    static func getBuffOrDebuff(imageNamed:String,size:CGSize,role: Identity,buff:BuffType)->Buff{
+            return Buff(imageNamed: imageNamed, size: size, role: role, buff: buff)
     }
 }
 
 
-class MovingObject: SKSpriteNode,NavigateProtocol{
+class MovingObject: SKSpriteNode,MovingProtocol{
+    
     var role:Identity?
+    
     init(imageNamed:String,size:CGSize,role: Identity){
         let texture = SKTexture(imageNamed: imageNamed)
         super.init(texture: texture, color: .clear, size: size)
@@ -119,7 +136,30 @@ class MovingObject: SKSpriteNode,NavigateProtocol{
     }
 }
 
+enum BuffType{
+    case Health(Float)
+    case Shield(Float)
+    case Ammo(AmmunitionType)
+}
+
+class Buff:MovingObject{
+    
+    var buff:BuffType?
+    
+    convenience init(imageNamed: String, size: CGSize, role: Identity,buff:BuffType){
+        self.init(imageNamed: imageNamed, size:size, role: role)
+        self.buff = buff
+    }
+    override init(imageNamed: String, size: CGSize, role: Identity) {
+        super.init(imageNamed: imageNamed, size: size, role: role)
+    }
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
 class Ammuniation: MovingObject{
+    
     var damage:Float?
     
     convenience init(imageNamed: String, size: CGSize, role: Identity,damage:Float){
@@ -128,7 +168,7 @@ class Ammuniation: MovingObject{
     }
     override init(imageNamed: String, size: CGSize, role: Identity) {
         super.init(imageNamed: imageNamed, size: size, role: role)
-        self.speed = 18
+        self.speed = 17
     }
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -139,12 +179,14 @@ class StarShip: MovingObject, CombatProtocol{
     
     var health: Float?{
         didSet{
-            if self.health! < 0{
+            if self.health! < ConstantValue.minFloat{
                 self.explode()
             }
         }
     }
+    
     var ammoType: AmmunitionType?
+    
     var shield: Float?
     
     override init(imageNamed: String,size:CGSize, role:Identity) {

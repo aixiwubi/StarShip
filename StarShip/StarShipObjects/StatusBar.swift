@@ -36,27 +36,24 @@ class StatusBar: UIView{
     }
     override func draw(_ rect: CGRect) {
         if let percentage = percentage{
-            let upperRect = CGRect(
+            let leftRect = CGRect(
                 x:rect.origin.x,
                 y:rect.origin.y,
-                width:rect.size.width,
-                height:rect.size.height*CGFloat(percentage)
+                width:rect.size.width*CGFloat(percentage),
+                height:rect.size.height
             )
-            let lowerRect = CGRect(
-                x:rect.origin.x,
-                y:rect.origin.y + (rect.size.height * CGFloat(percentage)),
-                width:rect.size.width,
-                height:rect.size.height * (1-CGFloat(percentage))
+            let rightRect = CGRect(
+                x:rect.origin.x + (rect.size.width * CGFloat(percentage)),
+                y:rect.origin.y,
+                width:rect.size.width * (1-CGFloat(percentage)),
+                height:rect.size.height
             )
             
             UIColor.green.set()
-            UIRectFill(upperRect)
+            UIRectFill(leftRect)
             UIColor.red.set()
-            UIRectFill(lowerRect)
+            UIRectFill(rightRect)
         }
     }
-    
-    private func adjust(){
-        
-    }
+
 }

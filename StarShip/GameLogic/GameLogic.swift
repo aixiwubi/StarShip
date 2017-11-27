@@ -18,7 +18,7 @@ class GameLogic:NSObject, SKPhysicsContactDelegate{
         didSet{
             if let controller = controller{
                 controller.playerHealth.percentage = percentage
-                if percentage == Float(0.0){
+                if percentage == ConstantValue.minFloat{
                     let finale = SKAction.fadeOut(withDuration: 1)
                     gameScene?.background.run(finale, completion: {
                         self.gameScene?.gameOver()
@@ -32,6 +32,7 @@ class GameLogic:NSObject, SKPhysicsContactDelegate{
     
     func didBegin(_ contact: SKPhysicsContact) {
         if let first = contact.bodyA.node as? MovingObject, let second = contact.bodyB.node as? MovingObject {
+            
             if let missile = first as? Ammuniation, let ship = second as? StarShip{
                 missileShipCollision(ship: ship, missile: missile)
                 animateExplosion(location: contact.contactPoint, radius: second.size)
@@ -49,15 +50,37 @@ class GameLogic:NSObject, SKPhysicsContactDelegate{
                 animateExplosion(location: contact.contactPoint, radius: second.size)
             }
             else if first.role == .buff{
-                if let _ = second as? StarShip{
+                if let ship = second as? StarShip, let buff = first as? Buff{
                     first.explode()
+                    applyBuff(ship:ship , buff: buff)
                     print("starship got a star")
                 }
             }else if second.role == .buff{
-                if let _ = first as? StarShip{
+                if let ship = first as? StarShip, let buff = second as? Buff{
                     second.explode()
+                    applyBuff(ship: ship, buff: buff)
                     print("starship got a star")
                 }
+            }
+        }
+    }
+    
+    private func applyBuff(ship:StarShip,buff:Buff){
+        if let type = buff.buff, let health = ship.health{
+            switch type{
+            case .Health(let x):
+                print(x)
+                ship.health = health + 10
+                updateHealth(ship: ship)
+            default:
+                print("default")
+            }
+        }
+    }
+    private func updateScore(){
+        if let current = controller?.score.text{
+            if let score = Float(current){
+                controller?.score.text = String(score + ConstantValue.Enemy.maxHealth)
             }
         }
     }
@@ -66,6 +89,10 @@ class GameLogic:NSObject, SKPhysicsContactDelegate{
         ship.health! -= missile.damage!
         if ship.role == .player{
             updateHealth(ship: ship)
+        }else if ship.role == .minion{
+            if ship.health! <= ConstantValue.minFloat{
+                updateScore()
+            }
         }
         missile.explode()
     }
@@ -87,12 +114,13 @@ class GameLogic:NSObject, SKPhysicsContactDelegate{
             updateHealth(ship: second)
         }
     }
+    
     private func updateHealth(ship:StarShip){
         if let health = ship.health{
-            if health <= Float(0){
-                percentage = Float(0.0)
+            if health <= ConstantValue.minFloat{
+                percentage = ConstantValue.minFloat
             }else{
-                percentage = health/100.0
+                percentage = health/ConstantValue.Player.maxHealth
             }
         }
         

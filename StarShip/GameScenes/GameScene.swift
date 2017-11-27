@@ -13,7 +13,21 @@ class GameScene: SKScene {
     var inProgress: Bool = false
     var player:StarShip?
     var background:SKSpriteNode = SKSpriteNode(imageNamed: "galaxy")
+    var boundry: CGRect?
     
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        setUp()
+    }
+    
+    override init(size: CGSize) {
+        super.init(size: size)
+        setUp()
+    }
+    
+    private func setUp(){
+       print(self.frame)
+    }
     
     override func didMove(to view: SKView){
         player = GameObjectFactory
@@ -37,10 +51,12 @@ class GameScene: SKScene {
     func spawnBuff(){
         if let player = player{
             let buff = GameObjectFactory
-                .getMovingObject(
+                .getBuffOrDebuff(
                     imageNamed: "star",
                     size: CGSize(width: player.size.width/2, height: player.size.height/2),
-                    role: .buff)
+                    role: .buff,
+                    buff: BuffType.Health(10.0)
+            )
             buff.position = CGPoint(x:self.frame.midX + 100, y:self.frame.midY - 100)
             addChild(buff)
         }
