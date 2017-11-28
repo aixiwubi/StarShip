@@ -34,7 +34,11 @@ class GameViewController: UIViewController {
     override func viewDidLoad() {
         
         super.viewDidLoad()
-        
+        setUp()
+       
+    }
+    
+    func setUp(){
         self.view.backgroundColor = UIColor.gray
         let scene = GameScene(size: gameView.frame.size)
         physicsContactDelegate.gameScene = scene
@@ -46,10 +50,8 @@ class GameViewController: UIViewController {
         gameView.ignoresSiblingOrder = true
         gameView.showsFPS = true
         gameView.showsNodeCount = true
-        
-        
+        scene.begin()
     }
-    
     
     override var shouldAutorotate: Bool {
         return false

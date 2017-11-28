@@ -44,6 +44,10 @@ class GameScene: SKScene {
         addChild(background)
         addChild(player!)
         inProgress = true
+       
+    }
+    
+    func begin(){
         spawnEnemy()
         spawnBuff()
     }
@@ -71,6 +75,7 @@ class GameScene: SKScene {
     func spawnEnemy(){
         let que = DispatchQueue.global(qos: .default)
         que.async {
+            sleep(3)
             if let player = self.player{
                 while(self.inProgress){
                     let enemy = GameObjectFactory.getStarShip(role: Identity.minion,size:player.size, name: "enemy")
